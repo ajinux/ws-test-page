@@ -34,15 +34,20 @@
         var ws;
         function connectToServer() {
             var icon = document.getElementById("connection_error_icon");
+            document.getElementById("connectionStatus").innerHTML = "connecting...";
+            document.getElementById("responseFromServer").value = "";
+            document.getElementById("connEstTime").innerHTML = "";
+            document.getElementById("connStartTime").innerHTML =  new Date().toLocaleString();
 
             try {
                 ws = new WebSocket(document.getElementById("serverSelected").value);
 
                 ws.onopen = function () {
                     document.getElementById("connectionStatus").innerHTML = "Connected";
+                    document.getElementById("connEstTime").innerHTML =  new Date().toLocaleString();
                 };
                 ws.onmessage = function (event) {
-                    document.getElementById("responseFromServer").value = event.data;
+                    document.getElementById("responseFromServer").value = new Date().toLocaleString() + " : " + event.data + "\n\n" + document.getElementById("responseFromServer").value;
                 };
                 ws.onclose = function () {
                     document.getElementById("connectionStatus").innerHTML = "Disconnected";
@@ -68,10 +73,22 @@
                 icon.title = '';
             } catch (e) {
                 icon.style.visibility = "visible";
+                console.log("ws error", e.message);
                 icon.title = e.message;
             }
         }
 
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('time').textContent = timeString;
+        }
+
+        // Call updateTime every second (1000 milliseconds)
+        setInterval(updateTime, 1000);
+
+        // Initial call to display time immediately on page load
+        updateTime();
     </script>
 </head>
 
@@ -81,7 +98,11 @@
     <div class="header">
         <h3 class="text-muted">WS Test Page Client</h3>
     </div>
-
+    <div>
+        <h3>Current Time:</h3>
+        <span id="time"></span>
+    </div>
+    <br>
     <div class="jumbotron_">
         <form class="form-horizontal">
             <div class="form-group">
@@ -106,11 +127,25 @@
     </div>
     <!-- /.row -->
     <div class="input-group">
-        Connection Status:
+        <strong>Connection Status:</strong>
       <span id="connectionStatus">
           Disconnected
       </span>
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="connection_error_icon" style="color:#c9302c; visibility: hidden"></span>
+    </div>
+
+     <div class="input-group">
+        <strong>Connection inititated time:</strong>
+      <span id="connStartTime">
+          
+      </span>
+    </div>
+
+    <div class="input-group">
+        <strong>Connection estabilished time:</strong>
+      <span id="connEstTime">
+          
+      </span>
     </div>
     <!-- /.row -->
 
